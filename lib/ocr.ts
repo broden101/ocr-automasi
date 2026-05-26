@@ -1,6 +1,5 @@
 "use client";
 
-import { createWorker } from "tesseract.js";
 import { OcrJob } from "./types";
 
 export interface OcrProgress {
@@ -14,6 +13,8 @@ export async function runOcr(
 ): Promise<{ text: string; confidence: number }> {
   onProgress({ status: "Initializing OCR engine...", progress: 0 });
 
+  // Dynamic import to avoid SSR issues with Web Workers
+  const { createWorker } = await import("tesseract.js");
   const worker = await createWorker(job.language, 1, {
     logger: (m: { status: string; progress: number }) => {
       if (m.status === "recognizing text") {
